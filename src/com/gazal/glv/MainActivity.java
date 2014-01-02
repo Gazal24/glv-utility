@@ -2,8 +2,6 @@ package com.gazal.glv;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -11,9 +9,13 @@ import com.gazal.glv.FeedContract.FeedEntry;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -22,21 +24,19 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.v4.app.NotificationCompat;
 import android.text.InputType;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
 public class MainActivity extends Activity {
 
@@ -46,6 +46,9 @@ public class MainActivity extends Activity {
 	public static WebView webView; 
 	private Button button;
 	final Context context = this;
+	public static boolean myStateOnWeb = true;
+	public static String myId = "x";
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		savedInstanceState = null;
@@ -71,6 +74,7 @@ public class MainActivity extends Activity {
 		super.onRestoreInstanceState(null);
 	}
 	
+	@SuppressLint("NewApi")
 	public void refreshAction(View view){
 		System.out.println("TRACK in refresh data");
 		JSONObject q=null;
@@ -87,6 +91,27 @@ public class MainActivity extends Activity {
 		}
 		
 		new DataDownloadTask().execute(uri);
+		
+		Intent resultIntent = new Intent(this, MainActivity.class);
+		PendingIntent pendingIntent = PendingIntent.getActivity(MainActivity.this, 0, resultIntent, Intent.FILL_IN_ACTION);
+
+		// build notification
+		// the addAction re-use the same intent to keep the example short
+		Notification n  = new NotificationCompat.Builder(this)
+		        .setContentTitle("New mail from " + "test@gmail.com")
+		        .setContentText("Subject")
+		        .setSmallIcon(R.drawable.ic_launcher)
+		        .setContentIntent(pendingIntent)
+		        .setAutoCancel(true).build();
+//		        .addAction(R.drawable.ic_launcher, "Call", pendingIntent)
+//		        .addAction(R.drawable.icon, "More", pIntent)
+//		        .addAction(R.drawable.icon, "And more", pIntent).build();
+		    
+		  
+		NotificationManager notificationManager = 
+		  (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+		notificationManager.notify(0, n); 
 	}
 	
 	public void setupButton(Button button, final String title,
@@ -185,6 +210,7 @@ public class MainActivity extends Activity {
 			    public void onClick(DialogInterface dialog, int which) {
 					myEditor.putString("USERNAME", input.getText().toString());
 					myEditor.commit();
+					myId = input.getText().toString();
 			    }
 			});
 			builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -194,7 +220,14 @@ public class MainActivity extends Activity {
 			    }
 			});
 			builder.show();
+		} else {
+			myId = sharedPref.getString("USERNAME", null);
 		}
+		refreshAction(webView);
+	    Switch sView = (Switch) findViewById(R.id.togglebutton);
+		if(!myStateOnWeb && sView.isChecked()) sView.toggle();
+		if(myStateOnWeb && !sView.isChecked()) sView.toggle();
+
 	}
 	
 	@Override

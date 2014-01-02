@@ -5,6 +5,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.SharedPreferences;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -82,11 +84,17 @@ public class DataDownloadTask extends AsyncTask<String, Void, String> {
 			else 
 				strStatus += "<br><font color=green><i>Gazal </i>&#10004";
 			//			System.out.println("TRACK SPARTA  jsongetString : " + result);
+
+			if(jsonObj.getString(MainActivity.myId).equals("0"))
+				MainActivity.myStateOnWeb = false;
+			else MainActivity.myStateOnWeb = true;
+		
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			System.out.println("TRACK SPARTA ERROR");
 		}
+		
 		String str = "<html><body align=center>"+strStatus+""+"</body></html>";
         MainActivity.webView.loadData(str, "text/html; charset=UTF-8", null);
 		System.out.println("TRACK result="+str);
