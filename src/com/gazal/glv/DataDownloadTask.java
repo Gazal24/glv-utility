@@ -7,6 +7,7 @@ import java.io.IOException;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -24,6 +25,10 @@ import android.webkit.WebView;
 
 public class DataDownloadTask extends AsyncTask<String, Void, String> {
 
+	MainActivity myMainActivity;
+	public DataDownloadTask(MainActivity activity){
+		myMainActivity = activity;
+	}
 	
 	@Override
 	protected String doInBackground(String... uri) {
@@ -62,26 +67,33 @@ public class DataDownloadTask extends AsyncTask<String, Void, String> {
 //        JSONArray jsonAry=null;
         JSONObject jsonObj=null;
 		String strStatus="";
+		int noCount = 0;
 		try {
 			jsonObj = new JSONArray(result).getJSONObject(0);
 //			System.out.println("TRACK SPARTA  jsonAry : " + jsonAry);
 //			jsonObj = jsonAry.getJSONObject(0);
 			String val = jsonObj.getString("a");
-			if(val.equals("0"))
+			if(val.equals("0")) {
 				strStatus += "<font color=red><i>Anurag </i>&#10008";
-			else 
+				noCount++;
+			}
+			else
 				strStatus += "<font color=green><i>Anurag </i>&#10004";
 
 			val = jsonObj.getString("s");
-			if(val.equals("0"))
+			if(val.equals("0")) {
 				strStatus += "<br><font color=red><i>Salil </i>&#10008";
-			else 
+				noCount++;
+			}
+			else
 				strStatus += "<br><font color=green><i>Salil </i>&#10004";
 
 			val = jsonObj.getString("g");
-			if(val.equals("0"))
+			if(val.equals("0")) {
 				strStatus += "<br><font color=red><i>Gazal </i>&#10008";
-			else 
+				noCount++;
+			}
+			else
 				strStatus += "<br><font color=green><i>Gazal </i>&#10004";
 			//			System.out.println("TRACK SPARTA  jsongetString : " + result);
 
@@ -98,7 +110,28 @@ public class DataDownloadTask extends AsyncTask<String, Void, String> {
 		String str = "<html><body align=center>"+strStatus+""+"</body></html>";
         MainActivity.webView.loadData(str, "text/html; charset=UTF-8", null);
 		System.out.println("TRACK result="+str);
-        //Do anything with response..
+
+		SharedPreferences sharedPref = myMainActivity.getPreferences(Context.MODE_PRIVATE);
+		int mInt = sharedPref.getInt("LAST_NO_COUNT", 0);
+		if(mInt != noCount) {
+			MainActivity.shouldNotify = true;
+			final Editor myEditor = sharedPref.edit();
+			myEditor.putInt("LAST_NO_COUNT", noCount);
+			myEditor.commit();
+		}
+		
+		if(MainActivity.shouldNotify) {
+			MainActivity.shouldNotify = false;
+			if(noCount == 1) {
+				myMainActivity.sendNotification("Word of Advice!", "A good person does not waste food (^.^)");
+			}
+			else if(noCount == 2) {
+				myMainActivity.sendNotification("Inform Cook!", "Bon Apetite odd man :-D");
+			}
+			else if(noCount == 3) {
+				myMainActivity.sendNotification("All Out!", "One of you should make the call X-(");
+			}
+		}
     }
 
 }

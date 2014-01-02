@@ -48,6 +48,7 @@ public class MainActivity extends Activity {
 	final Context context = this;
 	public static boolean myStateOnWeb = true;
 	public static String myId = "x";
+	public static boolean shouldNotify;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +75,11 @@ public class MainActivity extends Activity {
 		super.onRestoreInstanceState(null);
 	}
 	
+	public void refreshButtonClicked(View view){
+		MainActivity.shouldNotify = false; // should turn to true actually
+		refreshAction(view);
+	}
+	
 	@SuppressLint("NewApi")
 	public void refreshAction(View view){
 		System.out.println("TRACK in refresh data");
@@ -90,27 +96,27 @@ public class MainActivity extends Activity {
 			e.printStackTrace();
 		}
 		
-		new DataDownloadTask().execute(uri);
-		
+		new DataDownloadTask(this).execute(uri);
+	}
+
+	public void sendNotification(String title, String content){
 		Intent resultIntent = new Intent(this, MainActivity.class);
 		PendingIntent pendingIntent = PendingIntent.getActivity(MainActivity.this, 0, resultIntent, Intent.FILL_IN_ACTION);
 
 		// build notification
 		// the addAction re-use the same intent to keep the example short
 		Notification n  = new NotificationCompat.Builder(this)
-		        .setContentTitle("New mail from " + "test@gmail.com")
-		        .setContentText("Subject")
+		        .setContentTitle(title)
+		        .setContentText(content)
 		        .setSmallIcon(R.drawable.ic_launcher)
 		        .setContentIntent(pendingIntent)
 		        .setAutoCancel(true).build();
 //		        .addAction(R.drawable.ic_launcher, "Call", pendingIntent)
 //		        .addAction(R.drawable.icon, "More", pIntent)
 //		        .addAction(R.drawable.icon, "And more", pIntent).build();
-		    
 		  
 		NotificationManager notificationManager = 
 		  (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-
 		notificationManager.notify(0, n); 
 	}
 	
