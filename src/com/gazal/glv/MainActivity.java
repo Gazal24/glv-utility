@@ -5,8 +5,10 @@ import java.net.URLEncoder;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.crittercism.app.Crittercism;
 import com.gazal.glv.FeedContract.FeedEntry;
 
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.annotation.SuppressLint;
@@ -31,8 +33,8 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
-import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.RadioButton;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -44,7 +46,7 @@ public class MainActivity extends Activity {
 	public static String mainMessage=null;
 	public static TextView mTextView;
 	public static WebView webView; 
-	private Button button;
+	private ImageButton button;
 	final Context context = this;
 	public static boolean myStateOnWeb = true;
 	public static String myId = "x";
@@ -54,9 +56,10 @@ public class MainActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		savedInstanceState = null;
 		super.onCreate(null);
+		Crittercism.initialize(getApplicationContext(), "52cabfcd558d6a3c82000002");
 		setContentView(R.layout.activity_main);
 		
-		button = (Button) findViewById(R.id.buttonAlert);
+		button = (ImageButton) findViewById(R.id.buttonAlert);
 		setupButton(button, "Bye!!!","Sure quit ?", "Yea", "Naa");
 		// Initialize member TextView so we can manipulate it later
 	    mTextView = (TextView) findViewById(R.id.edit_message);
@@ -77,6 +80,7 @@ public class MainActivity extends Activity {
 	
 	public void refreshButtonClicked(View view){
 		MainActivity.shouldNotify = false; // should turn to true actually
+		webView.loadData("<i>Fetching...</i>","text/html", "UTF-8");
 		refreshAction(view);
 	}
 	
@@ -120,30 +124,31 @@ public class MainActivity extends Activity {
 		notificationManager.notify(0, n); 
 	}
 	
-	public void setupButton(Button button, final String title,
+	public void setupButton(ImageButton button2, final String title,
 			final String message, final String posText, final String negText) {
-		button.setOnClickListener(new OnClickListener () {
+		button2.setOnClickListener(new OnClickListener () {
 			public void onClick(View arg0) {
-				AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-						context);
-				alertDialogBuilder.setTitle(title);
-				alertDialogBuilder
-				.setMessage(message)
-				.setCancelable(false)
-				.setPositiveButton(posText ,new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog,int id) {
-						finish();
-					}
-				  })
-				.setNegativeButton(negText ,new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog,int id) {
-						dialog.cancel();
-					}
-				});
-				AlertDialog alertDialog = alertDialogBuilder.create();
-				 
-				// show it
-				alertDialog.show();
+				finish();
+//				AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
+//						context);
+//				alertDialogBuilder.setTitle(title);
+//				alertDialogBuilder
+//				.setMessage(message)
+//				.setCancelable(false)
+//				.setPositiveButton(posText ,new DialogInterface.OnClickListener() {
+//					public void onClick(DialogInterface dialog,int id) {
+//						finish();
+//					}
+//				  })
+//				.setNegativeButton(negText ,new DialogInterface.OnClickListener() {
+//					public void onClick(DialogInterface dialog,int id) {
+//						dialog.cancel();
+//					}
+//				});
+//				AlertDialog alertDialog = alertDialogBuilder.create();
+//				 
+//				// show it
+//				alertDialog.show();
 
 			}
 		});
@@ -158,6 +163,68 @@ public class MainActivity extends Activity {
 	@Override
 	public void onStart(){
 		super.onStart();
+		webView = (WebView) findViewById(R.id.myWebView);
+
+		//		refreshAction(new View(context));
+		SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
+//		String mText = sharedPref.getString("KEY_TEXT", null);
+		if(sharedPref.getString("USERNAME", null) == null){
+			final Editor myEditor = sharedPref.edit();
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setTitle("Your ID Sir!");
+
+			// Set up the input
+			final EditText input = new EditText(this);
+			// Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
+			input.setInputType(InputType.TYPE_CLASS_TEXT);
+			builder.setView(input);
+
+			// Set up the buttons
+			builder.setPositiveButton("OK", new DialogInterface.OnClickListener() { 
+			    @Override
+			    public void onClick(DialogInterface dialog, int which) {
+					myEditor.putString("USERNAME", input.getText().toString());
+					myEditor.commit();
+					myId = input.getText().toString();
+			    }
+			});
+			builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+			    @Override
+			    public void onClick(DialogInterface dialog, int which) {
+			        dialog.cancel();
+			    }
+			});
+			builder.show();
+		} else {
+			myId = sharedPref.getString("USERNAME", null);
+		}
+		refreshAction(webView);
+
+	}
+
+	public void updateSwitchStatus(){
+	    Switch sView = (Switch) findViewById(R.id.togglebutton);
+		if(!myStateOnWeb && sView.isChecked()) sView.toggle();
+		if(myStateOnWeb && !sView.isChecked()) sView.toggle();
+	}
+
+	public void callCook(View view){
+		String url = "tel:+919663099420";
+	    Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse(url));
+	    startActivity(intent);
+	}
+	
+	public void showCallCookButton(){
+		ImageButton bView = (ImageButton) findViewById(R.id.callcook);
+		bView.setVisibility(View.VISIBLE);
+	}
+
+	public void hideCallCookButton(){
+		ImageButton bView = (ImageButton) findViewById(R.id.callcook);
+		bView.setVisibility(View.GONE);
+	}
+	
+	public void loadShoppingAndEventFromDB(){
 		FeedReaderDbHelper mDbHelper = new FeedReaderDbHelper(this);
 		SQLiteDatabase db = mDbHelper.getReadableDatabase();
 		String[] projection = {
@@ -196,46 +263,7 @@ public class MainActivity extends Activity {
 		String str = "<html><body>"+strShop+"</ul>"+strEvent+"</ul>"+"</body></html>";
 		webView.loadDataWithBaseURL(null, str, "text/html", "utf-8", null);
 		db.close();
-//		refreshAction(new View(context));
-		SharedPreferences sharedPref = this.getPreferences(Context.MODE_PRIVATE);
-		String mText = sharedPref.getString("KEY_TEXT", null);
-		if(sharedPref.getString("USERNAME", null) == null){
-			final Editor myEditor = sharedPref.edit();
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setTitle("Your ID Sir!");
-
-			// Set up the input
-			final EditText input = new EditText(this);
-			// Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
-			input.setInputType(InputType.TYPE_CLASS_TEXT);
-			builder.setView(input);
-
-			// Set up the buttons
-			builder.setPositiveButton("OK", new DialogInterface.OnClickListener() { 
-			    @Override
-			    public void onClick(DialogInterface dialog, int which) {
-					myEditor.putString("USERNAME", input.getText().toString());
-					myEditor.commit();
-					myId = input.getText().toString();
-			    }
-			});
-			builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-			    @Override
-			    public void onClick(DialogInterface dialog, int which) {
-			        dialog.cancel();
-			    }
-			});
-			builder.show();
-		} else {
-			myId = sharedPref.getString("USERNAME", null);
-		}
-		refreshAction(webView);
-	    Switch sView = (Switch) findViewById(R.id.togglebutton);
-		if(!myStateOnWeb && sView.isChecked()) sView.toggle();
-		if(myStateOnWeb && !sView.isChecked()) sView.toggle();
-
 	}
-	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -260,10 +288,10 @@ public class MainActivity extends Activity {
 		String username = sharedPref.getString("USERNAME", null);
 
 	    if (on) {
-	    	MainActivity.webView.loadData("Yeaah...", "text/html; charset=UTF-8", null);;
+	    	MainActivity.webView.loadData("<b>Eat healthy be healthy.</b><p><i>Updating...</i>", "text/html; charset=UTF-8", null);
 			new DataUploadTask().execute(username,"1");
 	    } else {
-	    	MainActivity.webView.loadData("Noooh...", "text/html; charset=UTF-8", null);;
+	    	MainActivity.webView.loadData("<b>Good that you informed.</b><p><i>Updating...</i>", "text/html; charset=UTF-8", null);
 			new DataUploadTask().execute(username,"0");
 	        // Disable vibrate
 	    }

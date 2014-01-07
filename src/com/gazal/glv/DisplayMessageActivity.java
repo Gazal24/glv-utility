@@ -6,15 +6,12 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.webkit.WebView;
 import android.widget.TextView;
 import android.support.v4.app.NavUtils;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Intent;
 import android.os.Build;
-import android.widget.*;
 
 public class DisplayMessageActivity extends Activity {
 
@@ -29,7 +26,7 @@ public class DisplayMessageActivity extends Activity {
 		Intent intent = getIntent();
 		String msg = intent.getStringExtra(MainActivity.EXTRA_MESSAGE);
 		String category = intent.getStringExtra("CATEGORY");
-		System.out.println("TRACK : " + "Category in Display-" + category.toUpperCase());
+		System.out.println("TRACK : " + "Category in Display-" + category);
 		TextView textView = new TextView(this);
 		textView.setTextSize(20);
 		textView.setText(msg);

@@ -4,7 +4,6 @@ package com.gazal.glv;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -21,7 +20,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.os.AsyncTask;
-import android.webkit.WebView;
 
 public class DataDownloadTask extends AsyncTask<String, Void, String> {
 
@@ -61,17 +59,18 @@ public class DataDownloadTask extends AsyncTask<String, Void, String> {
 
     @Override
     protected void onPostExecute(String result) {
-		System.out.println("TRACK in postExecute");
+		System.out.println("TRACK in postExecute:" + result);
         super.onPostExecute(result);
         MainActivity.mainMessage = result;
 //        JSONArray jsonAry=null;
         JSONObject jsonObj=null;
 		String strStatus="";
 		int noCount = 0;
+		if(result==null) {
+			strStatus = "<font color=red><i>Network not available</i>";
+		}
 		try {
 			jsonObj = new JSONArray(result).getJSONObject(0);
-//			System.out.println("TRACK SPARTA  jsonAry : " + jsonAry);
-//			jsonObj = jsonAry.getJSONObject(0);
 			String val = jsonObj.getString("a");
 			if(val.equals("0")) {
 				strStatus += "<font color=red><i>Anurag </i>&#10008";
@@ -105,6 +104,9 @@ public class DataDownloadTask extends AsyncTask<String, Void, String> {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			System.out.println("TRACK SPARTA ERROR");
+		} catch (NullPointerException ex){
+			ex.printStackTrace();
+			System.out.println("TRACK NULL POINTER EX");
 		}
 		
 		String str = "<html><body align=center>"+strStatus+""+"</body></html>";
@@ -126,12 +128,16 @@ public class DataDownloadTask extends AsyncTask<String, Void, String> {
 				myMainActivity.sendNotification("Word of Advice!", "A good person does not waste food (^.^)");
 			}
 			else if(noCount == 2) {
-				myMainActivity.sendNotification("Inform Cook!", "Bon Apetite odd man :-D");
+				myMainActivity.sendNotification("Inform Cook!", "Bon Apetite odd man :-P");
 			}
 			else if(noCount == 3) {
-				myMainActivity.sendNotification("All Out!", "One of you should make the call X-(");
+				myMainActivity.sendNotification("All Out!", "One of you should make the call (o^0)");
 			}
 		}
-    }
+		myMainActivity.updateSwitchStatus();
+		if(MainActivity.myStateOnWeb)
+			myMainActivity.hideCallCookButton();
+		else myMainActivity.showCallCookButton();
 
+    }
 }

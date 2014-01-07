@@ -11,7 +11,8 @@
 	<string name="text_message"> Hi, Android!!</string>
 	<string name="alert_button_text">Quit</string>
 	<string name="save_button_text">Save</string>
+	<string name="call_cook_text">Call Cook</string>
 	<string name="refresh_button_text">Refresh</string>
-		<string name="shopping">Add Item to Shopping List</string>
+	<string name="shopping">Add Item to Shopping List</string>
 	<string name="event">Add an Event</string>
 </resources>

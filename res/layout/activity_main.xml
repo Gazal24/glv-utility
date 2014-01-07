@@ -11,17 +11,43 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity" 
     android:orientation="vertical">
-    <Switch 
-    android:id="@+id/togglebutton"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:textOn="At Home"
-    android:textOff="Outside"
-    android:onClick="onToggleClicked"/>
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:layout_marginBottom="15dp" >
 
+    <ImageButton
+        android:id="@+id/refresh"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:text="@string/refresh_button_text"
+        android:onClick="refreshButtonClicked"
+        android:background="@drawable/refreshbuttonimg" />
+    
+    <Switch
+        android:id="@+id/togglebutton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:onClick="onToggleClicked"
+        android:textOff="Outside"
+        android:textOn="At Home" />
+    
+    <ImageButton
+        android:id="@+id/buttonAlert"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/alert_button_text"
+        android:background="@drawable/quitbuttonimg"
+        android:layout_alignParentRight="true" />
+    
+    </RelativeLayout>
+    
     <RadioGroup android:layout_height = "wrap_content" 
         android:layout_width="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="gone">
         <RadioButton android:id="@+id/radio_shop"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -37,15 +63,17 @@
     <EditText android:id="@+id/edit_message"
         android:layout_width= "fill_parent"
         android:layout_height="wrap_content"
-        android:hint="@string/edit_message" />
+        android:hint="@string/edit_message"
+        android:visibility="gone" />
 	
     <WebView 
         android:id="@+id/myWebView"
 		android:layout_width="fill_parent"
-		android:layout_height="wrap_content">
+		android:layout_height="80dip"
+		android:layout_marginBottom="10dip">
     </WebView>
     
-	<LinearLayout
+	<RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:orientation="horizontal"
@@ -54,26 +82,25 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/button_send"
-        android:onClick="sendMessage" />
+        android:onClick="sendMessage"
+        android:visibility="gone" />
     
 	<Button
         android:id="@+id/save"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/save_button_text"
-        android:onClick="saveAction" />
-	<Button
-        android:id="@+id/refresh"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/refresh_button_text"
-        android:onClick="refreshButtonClicked" />
-	<Button
-        android:id="@+id/buttonAlert"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/alert_button_text" />
-	
-	</LinearLayout>
+        android:onClick="saveAction"
+        android:visibility="gone" />
+
+	<ImageButton android:id="@+id/callcook"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:layout_alignParentRight="true"
+	    android:text="@string/call_cook_text"
+	    android:onClick="callCook"
+	    android:background="@drawable/callcookimg"
+	    android:visibility="gone" />	
+	</RelativeLayout>
 </LinearLayout>
 </ScrollView>
