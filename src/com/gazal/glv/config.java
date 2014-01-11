@@ -8,5 +8,6 @@ public class config {
 	public static String mongolabCollectionName = "aaaaa";
 	public static String mongolabDbName = "bbbb_db";
 	public static String mongolabDocumentKey = "aaaaaaa";
+       public static String cook_number = "tel:+910123456789";
 	/** END **/
 }

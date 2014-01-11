@@ -209,8 +209,7 @@ public class MainActivity extends Activity {
 	}
 
 	public void callCook(View view){
-		String url = "tel:+919663099420";
-	    Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse(url));
+	    Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse(Config.cook_number));
 	    startActivity(intent);
 	}
 	
